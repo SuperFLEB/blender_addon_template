@@ -1,7 +1,16 @@
+if "bpy" in locals():
+    import importlib
+    for mod in (bpy, panel, preferences_panel):  # list all imports here
+        print("Reload mod", mod)
+        importlib.reload(mod)
+
+
 import bpy
 from . import preferences_panel
+from . import panel
 
-ThePreferencesPanel = preferences_panel.ThePreferencesPanel
+PreferencesPanel = preferences_panel.ThePreferencesPanel
+MainPanel = panel.MainPanel
 
 package_name = __package__
 
@@ -47,7 +56,8 @@ def menu_function(self, context):
 
 classes = [
     TheOperator,
-    ThePreferencesPanel
+    PreferencesPanel,
+    MainPanel
 ]
 
 menus = [

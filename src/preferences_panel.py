@@ -1,7 +1,7 @@
 import bpy
 
 package_name = __package__
-print("Preferences panel", __package__)
+
 
 class ThePreferencesPanel(bpy.types.AddonPreferences):
     bl_idname = package_name
