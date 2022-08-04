@@ -1,6 +1,6 @@
 if "bpy" in locals():
     import importlib
-    for mod in (bpy, panel, preferences_panel):  # list all imports here
+    for mod in (panel, preferences_panel):  # list all imports here
         print("Reload mod", mod)
         importlib.reload(mod)
 
@@ -499,7 +499,6 @@ menus = [
 
 def register():
     for c in classes:
-        print("Register", c)
         # Attempt to clean up if the addon broke during registration.
         try:
             bpy.utils.unregister_class(c)
