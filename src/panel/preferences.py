@@ -1,6 +1,15 @@
 import bpy
 
-package_name = __package__
+from ..lib import pkginfo
+
+if "_LOADED" in locals():
+    import importlib
+
+    for mod in (pkginfo,):  # list all imports here
+        importlib.reload(mod)
+_LOADED = True
+
+package_name = pkginfo.package_name()
 
 
 class ThePreferencesPanel(bpy.types.AddonPreferences):
@@ -11,6 +20,9 @@ class ThePreferencesPanel(bpy.types.AddonPreferences):
         default=False
     )
 
-    def draw(self, context):
+    def draw(self, context) -> None:
         layout = self.layout
         layout.prop(self, 'some_property')
+
+
+REGISTER_CLASSES = [ThePreferencesPanel]

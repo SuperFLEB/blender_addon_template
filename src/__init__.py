@@ -1,29 +1,35 @@
-if "bpy" in locals():
-    import importlib
-    for mod in (panel, preferences_panel):  # list all imports here
-        print("Reload mod", mod)
-        importlib.reload(mod)
-
-
+from typing import Callable
 import bpy
-from . import preferences_panel
-from . import panel
+from .operator import an_operator
+from .menu import object_context as object_context_menu
+from .panel import preferences as preferences_panel
 
-PreferencesPanel = preferences_panel.ThePreferencesPanel
-MainPanel = panel.MainPanel
+if "_LOADED" in locals():
+    import importlib
+
+    for mod in (an_operator, object_context_menu, preferences_panel,):  # list all imports here
+        importlib.reload(mod)
+_LOADED = True
 
 package_name = __package__
 
+# Search/Replace terms to customize this template:
+# - untitled_blender_addon -> Operator prefix
+# - UntitledBlenderAddon -> Class/variable name prefix
+# - Untitled Blender Addon -> The full name of the addon
+# - Description goes here -> Descriptions
+# - Name goes here -> Your name
+
 bl_info = {
     "name": "Untitled Blender Addon",
-    "description": "Someone forgot to change the bl_info from the template.",
-    "author": "FLEB (a.k.a. SuperFLEB)",
+    "description": "Description goes here",
+    "author": "Name goes here",
     "version": (0, 1, 0),
     "blender": (3, 1, 0),
     "location": "View3D > Object",
     "warning": "", # used for warning icon and text in addons panel
-    "doc_url": "https://github.com/SuperFLEB/{YOUR REPO HERE}",
-    "tracker_url": "https://github.com/SuperFLEB/{YOUR REPO HERE}/issues",
+    "doc_url": "https://github.com/{USERNAME}/{REPONAME}",
+    "tracker_url": "https://github.com/{USERNAME}/{REPONAME}/issues",
     "support": "COMMUNITY",
     # Categories:
     # 3D View, Add Curve, Add Mesh, Animation, Compositing, Development, Game Engine, Import-Export, Lighting, Material,
@@ -32,37 +38,43 @@ bl_info = {
 }
 
 
-class TheOperator(bpy.types.Operator):
-    """Put a description of what the operator does here"""
-    bl_idname = "object.untitled_blender_addon"
-    bl_label = "Untitled Blender Addon"
-    bl_options = {'REGISTER', 'UNDO'}
+def menuitem(cls: bpy.types.Operator | bpy.types.Menu, operator_context: str = "EXEC_DEFAULT") -> Callable:
+    if issubclass(cls, bpy.types.Operator):
+        def operator_fn(self, context):
+            self.layout.operator_context = operator_context
+            self.layout.operator(cls.bl_idname)
 
-    def execute(self, context):
-        prefs = context.preferences.addons[package_name].preferences
+        return operator_fn
+    if issubclass(cls, bpy.types.Menu):
+        def submenu_fn(self, context):
+            self.layout.menu(cls.bl_idname)
 
-        def message(menu, _):
-            menu.layout.label(text="It works!")
-        bpy.context.window_manager.popup_menu(message, title="Untitled Blender Addon")
-        return {'FINISHED'}
-
-
-def menu_function(self, context):
-    # Add code to determine if you want to show the menu or not, or remove this and the "if".
-    show_menu = 1
-    if show_menu:
-        self.layout.operator(TheOperator.bl_idname)
+        return submenu_fn
+    raise Exception(f"Untitled Blender Addon: Unknown menu type for menu {cls}. The developer screwed up.")
 
 
-classes = [
-    TheOperator,
-    PreferencesPanel,
-    MainPanel
+# Registerable modules have a REGISTER_CLASSES list that lists all registerable classes in the module
+registerable_modules = [
+    an_operator,
+    object_context_menu,
+    preferences_panel,
 ]
 
+classes = []
+
 menus = [
+    # ["NODE_MT_context_menu", menu_function],
+    # Some common ones:
+    # "Object" menu
+    # ["VIEW3D_MT_object", menu_function],
+    # "Add" menu
+    # ["VIEW3D_MT_add", menu_function],
+    # "Add > Mesh" menu
+    # ["VIEW3D_MT_mesh_add", menu_function],
+
     # Context (Spacebar/W) Menu
-    ["VIEW3D_MT_object_context_menu", menu_function],
+    ["VIEW3D_MT_object_context_menu", menuitem(object_context_menu.UntitledBlenderAddonSubmenu)],
+
     # Some common ones:
     # "Object" menu
     # ["VIEW3D_MT_object", menu_function],
@@ -497,23 +509,41 @@ menus = [
 ]
 
 
-def register():
-    for c in classes:
+def get_classes() -> list:
+    # Uses a set to prevent doubles, and a list to preserve order
+    all_classes = classes.copy()
+    known_classes = set(classes)
+    for module in [m for m in registerable_modules if hasattr(m, "REGISTER_CLASSES")]:
+        for cls in [c for c in module.REGISTER_CLASSES if c not in known_classes]:
+            all_classes.append(cls)
+            known_classes.add(cls)
+    return all_classes
+
+
+def register() -> None:
+    all_classes = get_classes()
+
+    for c in all_classes:
         # Attempt to clean up if the addon broke during registration.
         try:
             bpy.utils.unregister_class(c)
         except RuntimeError:
             pass
         bpy.utils.register_class(c)
+        print("Untitled Blender Addon registered class:", c)
     for m in menus:
         getattr(bpy.types, m[0]).append(m[1])
 
 
-def unregister():
-    for c in classes[::-1]:
-        bpy.utils.unregister_class(c)
+def unregister() -> None:
+    all_classes = get_classes()
     for m in menus[::-1]:
         getattr(bpy.types, m[0]).remove(m[1])
+    for c in all_classes[::-1]:
+        try:
+            bpy.utils.unregister_class(c)
+        except RuntimeError:
+            pass
 
 
 if __name__ == "__main__":

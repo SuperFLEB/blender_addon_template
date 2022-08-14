@@ -1,4 +1,4 @@
-# A Blender Addon
+# Untitled Blender Addon
 
 This is a Blender addon that allows you to do more in Blender than you could before.
 This Readme still nees to be written, as this is the dummy copy from the template.
