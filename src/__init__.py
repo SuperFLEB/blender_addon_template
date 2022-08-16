@@ -14,7 +14,7 @@ _LOADED = True
 package_name = __package__
 
 # Search/Replace terms to customize this template:
-# - untitled_blender_addon -> Operator prefix
+# - untitled_blender_addon -> Operator prefix and some file naming
 # - UntitledBlenderAddon -> Class/variable name prefix
 # - Untitled Blender Addon -> The full name of the addon
 # - Description goes here -> Descriptions
