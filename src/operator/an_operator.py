@@ -3,11 +3,12 @@ from typing import Set
 from bpy.props import StringProperty, IntProperty, FloatProperty, BoolProperty, EnumProperty, CollectionProperty
 from bpy.types import Operator
 from ..lib import pkginfo
+from ..lib import util
 
 if "_LOADED" in locals():
     import importlib
 
-    for mod in (pkginfo,):  # list all imports here
+    for mod in (pkginfo, util):  # list all imports here
         importlib.reload(mod)
 _LOADED = True
 
@@ -28,13 +29,13 @@ class AnOperator(Operator):
     bl_label = "Simple Operator"
     bl_options = {'REGISTER', 'UNDO'}
 
-    an_int_prop: IntProperty(name="Pick a number", description="Pick a number, any number")
+    an_int_prop: IntProperty(name="Pick a number", description="Pick a number, any number", default=0)
     a_simple_enum: EnumProperty(name="Axis", items=[
         ("VALUE_X", "X", "Axis X"),
         ("VALUE_Y", "Y", "Axis Y"),
         ("VALUE_Z", "Z", "Axis Z"),
 
-    ])
+    ], default="VALUE_X")
     a_complicated_enum: EnumProperty(name="Letterpeople", items=[
         # Entries with an empty value ("") are column headers and cannot be selected.
         # Value,    Name,     Description,          Icon,     Index
@@ -46,7 +47,7 @@ class AnOperator(Operator):
         ("ALICE", "Alice", "A person named Alice"),
         ("BOB", "Bob", "A person named Bob"),
         ("CHARLIE", "Charlie", "A person named Charlie"),
-    ])
+    ], default="ITEM_A")
     a_generated_enum: EnumProperty(name="Alignment", items=generate_enum_items)
     is_red: BoolProperty(name="R", default=False)
     is_green: BoolProperty(name="G", default=False)
@@ -74,8 +75,15 @@ class AnOperator(Operator):
         self.layout.label(text="Click OK to continue", icon="LIGHT")
 
     def invoke(self, context, event) -> Set[str]:
-        # You probably want to omit this in operators that work in the 3D view, as the Redo panel will handle
-        # configuration. Instead, either omit the invoke method entirely, or return like:
+        util.reset_operator_defaults(self, [
+            "an_int_prop",
+            "a_simple_enum",
+            "a_complicated_enum"
+        ])
+
+        # You probably want to omit the invoke_props_dialog in operators that work in the 3D view,
+        # as the Redo panel will handle configuration. Instead, either omit the invoke method entirely,
+        # or return like:
         # return execute(self, context)
         return context.window_manager.invoke_props_dialog(self)
 
@@ -86,7 +94,7 @@ class AnOperator(Operator):
             checked = prefs["some_property"]
             was_not_was = "was" if prefs["some_property"] else "was not"
             your_number = self.an_int_prop
-            menu.layout.label(text=a_lib.get_success_message(), icon="SOLO_ON")
+            menu.layout.label(text="It worked!", icon="SOLO_ON")
             menu.layout.label(text=f"Your number was {your_number}. Was I right?", icon="QUESTION")
             menu.layout.label(text=f"The checkbox in the Preferences panel {was_not_was} checked",
                               icon="CHECKMARK" if checked else "X")

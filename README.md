@@ -56,7 +56,7 @@ tricks and code snippets. It evolves as I muddle my way through. They might not 
 ## build_release.py
 
 `build_release.py` is a script that will package up your `src` directory, plus some other files, and make a ZIP archive,
-ready to install. It's easily customizable and comes out-of-the-box ready to handle most projects.
+ready to install. It's easily customizable and comes out-of-the-box ready to handle most projects built off this template.
 
 ### Necessary Customizations
 
@@ -65,7 +65,7 @@ Customizations can be done in the `# SETUP` section of the file. The minimum ite
 * `wrap_dir` - The directory the addon will wrapped in, i.e., what directory it will be installed to.
 * `output_file` - The file name of the ZIP file to be generated.
 
-If you did all the global replaces in the list up above, these will already have to be changed.
+If you did all the global replaces in the list up above, though, these will already be changed.
 
 ### How to use it
 

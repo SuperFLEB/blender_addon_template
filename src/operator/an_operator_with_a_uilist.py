@@ -3,11 +3,12 @@ from typing import Set
 from bpy.props import StringProperty, IntProperty, FloatProperty, BoolProperty, EnumProperty, CollectionProperty
 from bpy.types import Operator, PropertyGroup, UIList
 from ..lib import pkginfo
+from ..lib import util
 
 if "_LOADED" in locals():
     import importlib
 
-    for mod in (pkginfo,):  # list all imports here
+    for mod in (pkginfo, util,):  # list all imports here
         importlib.reload(mod)
 _LOADED = True
 
@@ -80,7 +81,7 @@ class AnOperatorWithUIList(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     uilist_items: CollectionProperty(type=APropertyGroup)
-    active_uilist_index: IntProperty(name="Number picked")
+    active_uilist_index: IntProperty(name="Selected", default=0)
 
     @classmethod
     def poll(cls, context) -> bool:
@@ -93,6 +94,10 @@ class AnOperatorWithUIList(Operator):
                                   "active_uilist_index")
 
     def invoke(self, context, event) -> Set[str]:
+        util.reset_operator_defaults(self, [
+            "active_uilist_index"
+        ])
+
         # Populate the uilist_items collection to populate the UIList. This can be done here or in execute, as needed.
         # With the filtering (see above), even numbers over 100 will not be shown.
         numbers_to_pick = list(range(1, 21)) + list(range(100, 121))
