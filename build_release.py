@@ -10,6 +10,7 @@ from os import chdir
 try:
     tag_name = subprocess.check_output(["git", "describe", "--tags"], stderr=subprocess.DEVNULL).decode(
         sys.stdout.encoding).strip()
+    tag_name = re.sub(r'[^\w._-]+', "_", tag_name)
 except subprocess.CalledProcessError:
     tag_name = "latest"
 

@@ -1,5 +1,6 @@
 import bpy
 from ..operator import an_operator
+from ..operator import an_operator_with_a_uilist
 
 if "_LOADED" in locals():
     import importlib
@@ -15,6 +16,7 @@ class UntitledBlenderAddonSubmenu(bpy.types.Menu):
 
     def draw(self, context) -> None:
         self.layout.operator(an_operator.AnOperator.bl_idname)
+        self.layout.operator(an_operator_with_a_uilist.AnOperatorWithUIList.bl_idname)
 
 
 REGISTER_CLASSES = [UntitledBlenderAddonSubmenu]

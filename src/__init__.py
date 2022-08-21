@@ -1,24 +1,18 @@
 from typing import Callable
 import bpy
 from .operator import an_operator
+from .operator import an_operator_with_a_uilist
 from .menu import object_context as object_context_menu
 from .panel import preferences as preferences_panel
 
 if "_LOADED" in locals():
     import importlib
 
-    for mod in (an_operator, object_context_menu, preferences_panel,):  # list all imports here
+    for mod in (an_operator, an_operator_with_a_uilist, object_context_menu, preferences_panel,):  # list all imports here
         importlib.reload(mod)
 _LOADED = True
 
 package_name = __package__
-
-# Search/Replace terms to customize this template:
-# - untitled_blender_addon -> Operator prefix and some file naming
-# - UntitledBlenderAddon -> Class/variable name prefix
-# - Untitled Blender Addon -> The full name of the addon
-# - Description goes here -> Descriptions
-# - Name goes here -> Your name
 
 bl_info = {
     "name": "Untitled Blender Addon",
@@ -56,6 +50,7 @@ def menuitem(cls: bpy.types.Operator | bpy.types.Menu, operator_context: str = "
 # Registerable modules have a REGISTER_CLASSES list that lists all registerable classes in the module
 registerable_modules = [
     an_operator,
+    an_operator_with_a_uilist,
     object_context_menu,
     preferences_panel,
 ]

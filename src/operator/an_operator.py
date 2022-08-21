@@ -3,25 +3,54 @@ from typing import Set
 from bpy.props import StringProperty, IntProperty, FloatProperty, BoolProperty, EnumProperty, CollectionProperty
 from bpy.types import Operator
 from ..lib import pkginfo
-from ..lib import a_lib
 
 if "_LOADED" in locals():
     import importlib
 
-    for mod in (a_lib, pkginfo,):  # list all imports here
+    for mod in (pkginfo,):  # list all imports here
         importlib.reload(mod)
 _LOADED = True
 
 package_name = pkginfo.package_name()
 
 
+def generate_enum_items(self, context) -> list[tuple[str, str, str]]:
+    result = []
+    for sign in "+-":
+        for axis in "XYZ":
+            result.append((f"{sign}{axis}", f"Align {sign}{axis}", f"Align something on the {sign}{axis} axis"))
+    return result
+
+
 class AnOperator(Operator):
     """Description goes here"""
     bl_idname = "untitled_blender_addon.an_operator"
-    bl_label = "Untitled Blender Addon"
+    bl_label = "Simple Operator"
     bl_options = {'REGISTER', 'UNDO'}
 
     an_int_prop: IntProperty(name="Pick a number", description="Pick a number, any number")
+    a_simple_enum: EnumProperty(name="Axis", items=[
+        ("VALUE_X", "X", "Axis X"),
+        ("VALUE_Y", "Y", "Axis Y"),
+        ("VALUE_Z", "Z", "Axis Z"),
+
+    ])
+    a_complicated_enum: EnumProperty(name="Letterpeople", items=[
+        # Entries with an empty value ("") are column headers and cannot be selected.
+        # Value,    Name,     Description,          Icon,     Index
+        ("", "Letters", "This is a header for the Letters column"),
+        ("ITEM_A", "Item A", "Static enum item A", "EVENT_A", 0),
+        ("ITEM_B", "Item B", "Static enum item B", "EVENT_B", 1),
+        ("ITEM_C", "Item C", "Static enum item C", "EVENT_B", 1),
+        ("", "People", "This is a header for the People column"),
+        ("ALICE", "Alice", "A person named Alice"),
+        ("BOB", "Bob", "A person named Bob"),
+        ("CHARLIE", "Charlie", "A person named Charlie"),
+    ])
+    a_generated_enum: EnumProperty(name="Alignment", items=generate_enum_items)
+    is_red: BoolProperty(name="R", default=False)
+    is_green: BoolProperty(name="G", default=False)
+    is_blue: BoolProperty(name="B", default=False)
 
     @classmethod
     def poll(cls, context) -> bool:
@@ -29,9 +58,25 @@ class AnOperator(Operator):
 
     def draw(self, context) -> None:
         self.layout.prop(self, "an_int_prop")
+
+        axis_row = self.layout.row(align=True)
+        axis_row.label(text="Axis:")
+        axis_row.prop(self, "a_simple_enum", expand=True)
+
+        rgb_row = self.layout.row(align=True)
+        rgb_row.label(text="Channels:")
+        rgb_row.prop(self, "is_red", toggle=1)
+        rgb_row.prop(self, "is_green", toggle=1)
+        rgb_row.prop(self, "is_blue", toggle=1)
+
+        self.layout.prop(self, "a_complicated_enum")
+        self.layout.prop(self, "a_generated_enum")
         self.layout.label(text="Click OK to continue", icon="LIGHT")
 
     def invoke(self, context, event) -> Set[str]:
+        # You probably want to omit this in operators that work in the 3D view, as the Redo panel will handle
+        # configuration. Instead, either omit the invoke method entirely, or return like:
+        # return execute(self, context)
         return context.window_manager.invoke_props_dialog(self)
 
     def execute(self, context) -> Set[str]:
