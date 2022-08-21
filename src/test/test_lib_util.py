@@ -55,5 +55,53 @@ class WordWrapTest(unittest.TestCase):
         self.assertEqual(expected, util.wordwrap(provided, 10))
 
 
+class UIListSortTest(unittest.TestCase):
+    def test_empty(self):
+        provided = []
+        expected = []
+        self.assertEqual(util.uilist_sort(provided), expected)
+
+    def test_one_item(self):
+        provided = ["A"]
+        expected = [0]
+        self.assertEqual(util.uilist_sort(provided, lambda value: value), expected)
+
+    def test_many_shuffled(self):
+        provided = list("BFCAED")
+        expected = [1, 5, 2, 0, 4, 3]
+        self.assertEqual(util.uilist_sort(provided, lambda value: value), expected)
+
+    def test_many_shuffled_except_first_and_last(self):
+        provided = list("ADCBEF")
+        expected = [0, 3, 2, 1, 4, 5]
+        self.assertEqual(util.uilist_sort(provided, lambda value: value), expected)
+
+    def test_many_inverted(self):
+        provided = list("FEDCBA")
+        expected = [5, 4, 3, 2, 1, 0]
+        self.assertEqual(util.uilist_sort(provided, lambda value: value), expected)
+
+    def test_many_already_sorted(self):
+        provided = list("ABCDEF")
+        expected = [0, 1, 2, 3, 4, 5]
+        self.assertEqual(util.uilist_sort(provided, lambda value: value), expected)
+
+    def test_many_numeric_shuffled(self):
+        # Just to make sure numeric sort values work
+        provided = [2, 30, 3, 1, 20, 10]
+        expected = [1, 5, 2, 0, 4, 3]
+        self.assertEqual(util.uilist_sort(provided, lambda value: value), expected)
+
+    def test_make_sortable(self):
+        """Verify that the make_sortable_fn param actually runs, by having it invert the expected order"""
+        provided = [0, 1, 2, 3, 4, 5]
+
+        def make_sortable_fn(val: int) -> int:
+            return 100 - val
+
+        expected = [5, 4, 3, 2, 1, 0]
+        self.assertEqual(util.uilist_sort(provided, make_sortable_fn), expected)
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterable, Callable
 import bpy
 import re
 
@@ -62,3 +62,23 @@ def reset_operator_defaults(operator_instance, keys: Iterable[str]) -> None:
     for key in keys:
         if key in defaults:
             setattr(operator_instance, key, defaults[key])
+
+
+def uilist_sort(items: list[any], make_sortable_fn: Callable[[any], any] = lambda value: value) -> list[int]:
+    """Given an unsorted list and a normalizing function, generates a list of movement directives in the form that
+    UIList sorting requires."""
+
+    # Return a list (of the same length) with the values being what index the value at that index should be moved to.
+    # So, if what is index 4 should be at index 2, the array should have 2 at its index 4
+
+    # First, get the indices of the source list, reordered to where they should be, so you have a list where
+    #    indices[destination_index] = source_index
+    indices = [item[0] for item in sorted(enumerate(items), key=lambda item: make_sortable_fn(item[1]))]
+
+    # Second, flip that to construct a list like
+    #     moves[source_index] = destination_index
+    moves = [0] * len(indices)
+    for to_dest_index, from_source_index in enumerate(indices):
+        moves[from_source_index] = to_dest_index
+
+    return moves

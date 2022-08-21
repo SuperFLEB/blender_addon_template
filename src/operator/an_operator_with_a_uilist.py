@@ -1,5 +1,6 @@
-import bpy
 from typing import Set
+import bpy
+import random
 from bpy.props import StringProperty, IntProperty, FloatProperty, BoolProperty, EnumProperty, CollectionProperty
 from bpy.types import Operator, PropertyGroup, UIList
 from ..lib import pkginfo
@@ -39,17 +40,10 @@ class AUIList(UIList):
         # the_properties is from data.<propname>, which has the list items as a list of APropertyGroup instances
         the_properties = getattr(data, propname)
 
-        # To sort, return a list (of the same length) with the indices of the incoming list ordered as they should
-        # be sorted. E.g., to sort a list backwards, the sorting list should be [5,4,3,2,1]
-        resorted = sorted(
-            # Generate a list of dicts with (unsorted) index and value, because we store the unsorted index
-            # and use the value to finesse the sort.
-            [{"was_idx": idx, "value": value} for idx, value in enumerate(the_properties)],
-            # Finesse the sorting here if you want, or remove this if you don't need to
-            key=lambda item: item["value"].integer
-        )
+        def sortable_value(raw_value: APropertyGroup):
+            return raw_value.integer
 
-        new_order = [item["was_idx"] for item in resorted]
+        sort_moves = util.uilist_sort(the_properties, sortable_value)
 
         # To filter, make a list of ints that either have self.bitflag_filter_item (to show)
         # or ~self.bitflag_filter_item (to hide)
@@ -66,7 +60,7 @@ class AUIList(UIList):
         # e.g.,
         # return [], new_order
         # return filter_flags, []
-        return filter_flags, new_order
+        return filter_flags, sort_moves
 
     def draw_item(self, context, layout, data, item, iocon, active_data, active_propname, index) -> None:
         layout.label(icon="OUTLINER_OB_LIGHT" if item.is_even else "LIGHT")
@@ -94,13 +88,16 @@ class AnOperatorWithUIList(Operator):
                                   "active_uilist_index")
 
     def invoke(self, context, event) -> Set[str]:
-        util.reset_operator_defaults(self, [
-            "active_uilist_index"
-        ])
-
         # Populate the uilist_items collection to populate the UIList. This can be done here or in execute, as needed.
         # With the filtering (see above), even numbers over 100 will not be shown.
         numbers_to_pick = list(range(1, 21)) + list(range(100, 121))
+
+        # Now, let's shuffle it to simulate bogus data and make sure the sorting works.
+        # Don't do this in your actual code. This is just a demonstration to show that unsorted data renders sorted.
+        random.shuffle(numbers_to_pick)
+        # Also, initialize the active index to the value 1, not index 0, since we screwed with the indices.
+        self.active_uilist_index = numbers_to_pick.index(1)
+
         self.uilist_items.clear()
         for num in numbers_to_pick:
             uilist_item: APropertyGroup = self.uilist_items.add()
