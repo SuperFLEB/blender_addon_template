@@ -71,14 +71,12 @@ def uilist_sort(items: list[any], make_sortable_fn: Callable[[any], any] = lambd
     # Return a list (of the same length) with the values being what index the value at that index should be moved to.
     # So, if what is index 4 should be at index 2, the array should have 2 at its index 4
 
-    # First, get the indices of the source list, reordered to where they should be, so you have a list where
-    #    indices[destination_index] = source_index
-    indices = [item[0] for item in sorted(enumerate(items), key=lambda item: make_sortable_fn(item[1]))]
+    moves = [0] * len(items)
 
-    # Second, flip that to construct a list like
-    #     moves[source_index] = destination_index
-    moves = [0] * len(indices)
-    for to_dest_index, from_source_index in enumerate(indices):
-        moves[from_source_index] = to_dest_index
+    # Achieve this by enumerating the original list, sorting the enumeration by value, then enumerating that, so
+    # we have both the original position and the new (desired) one...
+    for (new_index, (original_index, _)) in enumerate(sorted(enumerate(items), key=lambda item: make_sortable_fn(item[1]))):
+        # ...then assigning value new_index to list item original_index
+        moves[original_index] = new_index
 
     return moves
