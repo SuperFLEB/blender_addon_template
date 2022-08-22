@@ -91,8 +91,8 @@ class AnOperator(Operator):
         prefs = context.preferences.addons[package_name].preferences
 
         def message(menu, _) -> None:
-            checked = prefs["some_property"]
-            was_not_was = "was" if prefs["some_property"] else "was not"
+            checked = prefs["some_property"] if "some_property" in prefs else False
+            was_not_was = "was" if checked else "was not"
             your_number = self.an_int_prop
             menu.layout.label(text="It worked!", icon="SOLO_ON")
             menu.layout.label(text=f"Your number was {your_number}. Was I right?", icon="QUESTION")
