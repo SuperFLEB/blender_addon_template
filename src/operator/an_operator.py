@@ -55,6 +55,13 @@ class AnOperator(Operator):
 
     @classmethod
     def poll(cls, context) -> bool:
+        # Tooltip if the poll returns False
+        cls.poll_message_set('You are not yet ready to harness the power of An Operator')
+        return True
+
+    @classmethod
+    def can_show(cls, context) -> bool:
+        # Similar to the poll() method, but manually implemented to completely omit the menu item from showing.
         return True
 
     def draw(self, context) -> None:

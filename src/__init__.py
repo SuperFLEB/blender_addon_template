@@ -4,11 +4,13 @@ from .operator import an_operator
 from .operator import an_operator_with_a_uilist
 from .menu import object_context as object_context_menu
 from .panel import preferences as preferences_panel
+from .panel import n_panel
+from .panel import object_panel
 
 if "_LOADED" in locals():
     import importlib
 
-    for mod in (an_operator, an_operator_with_a_uilist, object_context_menu, preferences_panel,):  # list all imports here
+    for mod in (an_operator, an_operator_with_a_uilist, object_context_menu, preferences_panel, n_panel, object_panel, ):  # list all imports here
         importlib.reload(mod)
 _LOADED = True
 
@@ -36,8 +38,8 @@ def menuitem(cls: bpy.types.Operator | bpy.types.Menu, operator_context: str = "
     if issubclass(cls, bpy.types.Operator):
         def operator_fn(self, context):
             self.layout.operator_context = operator_context
-            self.layout.operator(cls.bl_idname)
-
+            if (not hasattr(cls, 'can_show')) or cls.can_show(context):
+                self.layout.operator(cls.bl_idname)
         return operator_fn
     if issubclass(cls, bpy.types.Menu):
         def submenu_fn(self, context):
@@ -53,6 +55,8 @@ registerable_modules = [
     an_operator_with_a_uilist,
     object_context_menu,
     preferences_panel,
+    n_panel,
+    object_panel,
 ]
 
 classes = []

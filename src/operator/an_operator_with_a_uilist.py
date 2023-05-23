@@ -34,7 +34,7 @@ class APropertyGroup(PropertyGroup):
 class AUIList(UIList):
     """A UIList to display some numbers"""
     bl_label = "Numbers"
-    bl_idname = "CUSTOM_UL_numbers"
+    bl_idname = "UNTITLED_BLENDER_ADDON_UL_a_ui_list"
 
     def filter_items(self, context, data, propname):
         # the_properties is from data.<propname>, which has the list items as a list of APropertyGroup instances
@@ -79,12 +79,19 @@ class AnOperatorWithUIList(Operator):
 
     @classmethod
     def poll(cls, context) -> bool:
+        # Tooltip if the poll returns False
+        cls.poll_message_set('You are not yet ready to harness the power of An Operator With a UIList')
+        return True
+
+    @classmethod
+    def can_show(cls, context) -> bool:
+        # Similar to the poll() method, but manually implemented to completely omit the menu item from showing.
         return True
 
     def draw(self, context) -> None:
         self.layout.label(
             text=f"You picked {self.uilist_items[self.active_uilist_index].integer} ({self.uilist_items[self.active_uilist_index].hex})")
-        self.layout.template_list("CUSTOM_UL_numbers", "a_list_of_numbers", self, "uilist_items", self,
+        self.layout.template_list("UNTITLED_BLENDER_ADDON_UL_a_ui_list", "a_list_of_numbers", self, "uilist_items", self,
                                   "active_uilist_index")
 
     def invoke(self, context, event) -> Set[str]:

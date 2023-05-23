@@ -13,6 +13,8 @@ tricks and code snippets. It evolves as I muddle my way through. They might not 
   * Class registration via list
   * The ability to register whole modules that include a `REGISTER_CLASSES` array of their own
   * A common menu-item loader for both operators and submenus
+  * Support for a `can_show()` static method on operators. Like `poll()`, but hides the item instead of graying it out.
+    * _Note that the `can_show()` method needs to be tested in menu and submenu `draw()` functions. It is not built in to Blender itself like `poll()` is. The check is included in the sample submenu and the `__init__.js` file._ 
 * Starter unit tests
 * A `util` lib with some handy functions:
   * Flatten lists!
@@ -24,24 +26,28 @@ tricks and code snippets. It evolves as I muddle my way through. They might not 
   * An operator with a whole bunch of panel components
   * An operator with a UIList, including sorting and filtering
   * A Preferences panel
+  * An Operator panel sub-panel
+  * A Properties panel (N panel)
   * A submenu
 
 ...and (if I forgot to update this Readme) more!
 
-## What's not included, that I really ought to (i.e., the todo-list)
+## What's not included, that I really ought to (i.e., the to-do list)
 
-* An N-panel example
-* A Properties panel example, maybe?
+* Make a Python script to do the setup
 * Some libs for/examples of loading external data
   * Simple, and clean-up-after-yourself loading
 
 ## How to use it
 
-1. Do all the Git stuff: Clone it off, remove the .git directory, and `git init` to make a new project.
+1. Do all the Git stuff:
+   * Clone it
+   * Make it yours! Remove the `.git` directory, and `git init` to make a new project.
 2. In your IDE/editor of choice, do a few global replaces:
    ```
         untitled_blender_addon  -> Operator prefix and some file naming
         UntitledBlenderAddon    -> Class/variable name prefix
+        UNTITLED_BLENDER_ADDON  -> bl_idname prefix
         Simple Operator         -> The name for the simple operator
         UIList Operator         -> The name for the UIList demo operator
         Untitled Blender Addon  -> The full name of the addon

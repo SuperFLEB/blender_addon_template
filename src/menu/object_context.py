@@ -11,12 +11,13 @@ _LOADED = True
 
 
 class UntitledBlenderAddonSubmenu(bpy.types.Menu):
-    bl_idname = 'untitled_blender_addon.untitled_blender_addon'
+    bl_idname = 'UNTITLED_BLENDER_ADDON_MT_untitled_blender_addon_submenu'
     bl_label = 'Untitled Blender Addon'
 
     def draw(self, context) -> None:
-        self.layout.operator(an_operator.AnOperator.bl_idname)
-        self.layout.operator(an_operator_with_a_uilist.AnOperatorWithUIList.bl_idname)
+        for cls in [an_operator.AnOperator, an_operator_with_a_uilist.AnOperatorWithUIList]:
+            if (not hasattr(cls, 'can_show')) or cls.can_show(context):
+                self.layout.operator(cls.bl_idname)
 
 
 REGISTER_CLASSES = [UntitledBlenderAddonSubmenu]
