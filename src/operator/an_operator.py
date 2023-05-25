@@ -26,7 +26,7 @@ def generate_enum_items(self, context) -> list[tuple[str, str, str]]:
 class AnOperator(Operator):
     """Description goes here"""
     bl_idname = "untitled_blender_addon.an_operator"
-    bl_label = "Simple Operator"
+    bl_label = "An Operator"
     bl_options = {'REGISTER', 'UNDO'}
 
     an_int_prop: IntProperty(name="Pick a number", description="Pick a number, any number", default=0)
