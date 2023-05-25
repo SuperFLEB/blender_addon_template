@@ -9,10 +9,11 @@ tricks and code snippets. It evolves as I muddle my way through. They might not 
 
 * A structure featuring a `src` directory for packageable source.
 * Directories for library files (simple modules with collections of functions)
-* An `__init__.py` with register/deregister functions...
+* An `__init__.py` and `lib/addon.py` with register/deregister functions...
   * Class registration via list
   * The ability to register whole modules that include a `REGISTER_CLASSES` array of their own
   * A common menu-item loader for both operators and submenus
+  * A subclass for no-draw() simplified submenus
   * Support for a `can_show()` static method on operators. Like `poll()`, but hides the item instead of graying it out.
     * _Note that the `can_show()` method needs to be tested in menu and submenu `draw()` functions. It is not built in to Blender itself like `poll()` is. The check is included in the sample submenu and the `__init__.js` file._ 
 * Starter unit tests
@@ -23,6 +24,7 @@ tricks and code snippets. It evolves as I muddle my way through. They might not 
   * Get operators' defaults! And reset operators' properties to defaults!
 * Example code:
   * A starter Readme
+  * A simple operator that doesn't do much
   * An operator with a whole bunch of panel components
   * An operator with a UIList, including sorting and filtering
   * A Preferences panel
@@ -59,12 +61,12 @@ tricks and code snippets. It evolves as I muddle my way through. They might not 
 3. Swap in the `README.SAMPLE.md` file for `README.md` and customize it
 4. Start making your Blender addon!
 
-## build_release.py
+# build_release.py
 
 `build_release.py` is a script that will package up your `src` directory, plus some other files, and make a ZIP archive,
 ready to install. It's easily customizable and comes out-of-the-box ready to handle most projects built off this template.
 
-### Necessary Customizations
+## Necessary Customizations
 
 Customizations can be done in the `# SETUP` section of the file. The minimum items that will need to be customized are:
 
@@ -73,7 +75,7 @@ Customizations can be done in the `# SETUP` section of the file. The minimum ite
 
 If you did all the global replaces in the list up above, though, these will already be changed.
 
-### How to use it
+## How to use it
 
 Before building an actual release, you should Git tag the latest commit to a version number, as this is included in the
 file naming.
@@ -90,7 +92,7 @@ python build_release.py
 
 and a `name_of_project_0.1.2.zip` file will be generated, which can be installed via the Blender Add-ons manager.
 
-### What it does
+## What it does
 
 1. Uses `git` to determine the version (by tag)
 2. Creates a ZIP archive named `{Project name}_{Git tag name}.zip`
@@ -103,7 +105,7 @@ and a `name_of_project_0.1.2.zip` file will be generated, which can be installed
 
 Of course, the script is easily customizable to add exceptions and toss-ins, and to tweak file names.
 
-### What it doesn't do
+## What it doesn't do
 
 * It doesn't look at `.gitignore`. You might want some of those files.
 * It doesn't run tests before packaging. Since it'd need to find and run the right version of Blender, 
