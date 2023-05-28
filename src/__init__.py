@@ -503,6 +503,8 @@ def register() -> None:
         except RuntimeError:
             pass
         bpy.utils.register_class(c)
+        if hasattr(c, 'post_register') and callable(c.post_register):
+            c.post_register()
         print("Untitled Blender Addon registered class:", c)
     addon.register_menus(menus)
 
@@ -514,6 +516,8 @@ def unregister() -> None:
     for c in addon.get_registerable_classes(registerable_modules)[::-1]:
         try:
             bpy.utils.unregister_class(c)
+            if hasattr(c, 'post_unregister') and callable(c.post_unregister):
+                c.post_unregister()
         except RuntimeError:
             pass
 

@@ -16,6 +16,16 @@ class ASimpleOperator(Operator):
     bl_label = "Simple Operator"
     bl_options = {'REGISTER', 'UNDO'}
 
+    @classmethod
+    def post_register(cls):
+        # Do something after registering the class in __init__.py
+        pass
+
+    @classmethod
+    def post_unregister(cls):
+        # Do something after unregistering the class in __init__.py
+        pass
+
     def draw(self, context) -> None:
         # In the demo, you should NOT see this popup because the operator_context is EXEC_DEFAULT
         # and neither invoke() nor this draw() will run.
