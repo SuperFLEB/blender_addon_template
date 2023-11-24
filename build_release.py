@@ -3,14 +3,35 @@
 import subprocess
 import re
 import sys
+import ast
 from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
 from os import chdir
 
+
+def bl_info_version() -> tuple[int, int, int] | None:
+    try:
+        module_fh = open('src/__init__.py', 'r')
+        module_file = module_fh.read()
+        module_fh.close()
+        for node in ast.parse(module_file).body:
+            if isinstance(node, ast.Assign) and node.targets[0].id == 'bl_info':
+                bl_info = ast.literal_eval(node.value)
+                return bl_info['version']
+    except:
+        return None
+
+# FIND AND VERIFY TAG
 try:
     tag_name = subprocess.check_output(["git", "describe", "--tags"], stderr=subprocess.DEVNULL).decode(
         sys.stdout.encoding).strip()
     tag_name = re.sub(r'[^\w._-]+', "_", tag_name)
+    if matches := re.fullmatch(r'v?(\d+)\.(\d+)\.(\d+)', tag_name):
+        bl_vers = bl_info_version()
+        tag_vers = tuple([int(g) for g in matches.groups()])
+        if bl_vers is not None and bl_vers != tag_vers:
+            print(f"<<!>> Version {bl_vers} in the bl_info global in src/__init__.py does not match \"{tag_name}\" in the tag. Setting version to \"latest\".")
+            tag_name = "latest"
 except subprocess.CalledProcessError:
     tag_name = "latest"
 

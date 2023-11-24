@@ -31,12 +31,15 @@ tricks and code snippets. It evolves as I muddle my way through. They might not 
   * An Operator panel sub-panel
   * A Properties panel (N panel)
   * A submenu
+* A packager, build_release.py
+  * Packs up `src`, and throws in whatever else you want
+  * Uses Git tags and the bl_info to set the version number
 
 ...and (if I forgot to update this Readme) more!
 
 ## What's not included, that I really ought to (i.e., the to-do list)
 
-* Make a Python script to do the setup
+* Make a Python script to do the setup, instead of a bunch of search/replace
 * Some libs for/examples of loading external data
   * Simple, and clean-up-after-yourself loading
 
@@ -77,8 +80,8 @@ If you did all the global replaces in the list up above, though, these will alre
 
 ## How to use it
 
-Before building an actual release, you should Git tag the latest commit to a version number, as this is included in the
-file naming.
+Before building an actual release, you should update the `version` in your bl_info in `__init__.py`, then Git tag the
+latest commit to that version number (using either "X.X.X" or "vX.X.X" format), as this is included in the file naming.
 
 ```shell
 git tag 0.1.2
