@@ -23,7 +23,7 @@ bl_info = {
     "description": "Description goes here",
     "author": "Name goes here",
     "version": (0, 1, 0),
-    "blender": (3, 1, 0),
+    "blender": (3, 4, 0),
     "location": "View3D > Object",
     "warning": "", # used for warning icon and text in addons panel
     "doc_url": "https://github.com/{USERNAME}/{REPONAME}",
