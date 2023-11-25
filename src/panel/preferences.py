@@ -12,7 +12,7 @@ _LOADED = True
 package_name = pkginfo.package_name()
 
 
-class ThePreferencesPanel(bpy.types.AddonPreferences):
+class PreferencesPanel(bpy.types.AddonPreferences):
     bl_idname = package_name
     preferences_checkbox_property: bpy.props.BoolProperty(
         name="Turn on checkbox in preferences panel",
@@ -25,4 +25,4 @@ class ThePreferencesPanel(bpy.types.AddonPreferences):
         layout.prop(self, 'preferences_checkbox_property')
 
 
-REGISTER_CLASSES = [ThePreferencesPanel]
+REGISTER_CLASSES = [PreferencesPanel]

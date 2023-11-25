@@ -10,7 +10,7 @@ if "_LOADED" in locals():
 _LOADED = True
 
 
-class ASimpleOperator(Operator):
+class UNTITLED_BLENDER_ADDON_OT_ASimpleOperator(Operator):
     """Description goes here"""
     bl_idname = "untitled_blender_addon.a_simple_operator"
     bl_label = "Simple Operator"
@@ -42,4 +42,4 @@ class ASimpleOperator(Operator):
         return {'FINISHED'}
 
 
-REGISTER_CLASSES = [ASimpleOperator]
+REGISTER_CLASSES = [UNTITLED_BLENDER_ADDON_OT_ASimpleOperator]

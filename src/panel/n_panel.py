@@ -9,7 +9,7 @@ if "_LOADED" in locals():
 _LOADED = True
 
 
-class NPanel(Panel):
+class VIEW3D_PT_PT_NPanel(Panel):
     bl_idname = 'VIEW3D_PT_n_panel'
     bl_category = 'Untitled Blender Addon'
     bl_label = 'Untitled Blender Addon'
@@ -20,4 +20,4 @@ class NPanel(Panel):
         self.layout.label(text='This is an N panel')
 
 
-REGISTER_CLASSES = [NPanel]
+REGISTER_CLASSES = [VIEW3D_PT_PT_NPanel]

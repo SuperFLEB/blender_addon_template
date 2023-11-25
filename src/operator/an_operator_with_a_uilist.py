@@ -68,7 +68,7 @@ class AUIList(UIList):
         layout.label(text=item.hex)
 
 
-class AnOperatorWithUIList(Operator):
+class UNTITLED_BLENDER_ADDON_OT_AnOperatorWithUIList(Operator):
     """Description goes here"""
     bl_idname = "untitled_blender_addon.an_operator_with_uilist"
     bl_label = "UIList Operator"
@@ -128,4 +128,4 @@ class AnOperatorWithUIList(Operator):
         return {'FINISHED'}
 
 
-REGISTER_CLASSES = [APropertyGroup, AUIList, AnOperatorWithUIList]
+REGISTER_CLASSES = [APropertyGroup, AUIList, UNTITLED_BLENDER_ADDON_OT_AnOperatorWithUIList]

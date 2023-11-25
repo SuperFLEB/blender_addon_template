@@ -9,7 +9,7 @@ if "_LOADED" in locals():
 _LOADED = True
 
 
-class ObjectPanel(bpy.types.Panel):
+class OBJECT_PT_ObjectPanel(bpy.types.Panel):
     """An example object properties panel"""
     bl_idname = "OBJECT_PT_ObjectPanel"
     bl_label = "Untitled Blender Addon"
@@ -24,4 +24,4 @@ class ObjectPanel(bpy.types.Panel):
         # ...
 
 
-REGISTER_CLASSES = [ObjectPanel]
+REGISTER_CLASSES = [OBJECT_PT_ObjectPanel]

@@ -12,7 +12,9 @@ from .panel import object_panel
 if "_LOADED" in locals():
     import importlib
 
-    for mod in (addon, a_simple_operator, an_operator, an_operator_with_a_uilist, object_context_menu, preferences_panel, n_panel, object_panel, ):  # list all imports here
+    for mod in (
+    addon, a_simple_operator, an_operator, an_operator_with_a_uilist, object_context_menu, preferences_panel, n_panel,
+    object_panel,):  # list all imports here
         importlib.reload(mod)
 _LOADED = True
 
@@ -25,7 +27,7 @@ bl_info = {
     "version": (0, 1, 0),
     "blender": (3, 4, 0),
     "location": "View3D > Object",
-    "warning": "", # used for warning icon and text in addons panel
+    "warning": "",  # used for warning icon and text in addons panel
     "doc_url": "https://github.com/{USERNAME}/{REPONAME}",
     "tracker_url": "https://github.com/{USERNAME}/{REPONAME}/issues",
     "support": "COMMUNITY",
@@ -34,7 +36,6 @@ bl_info = {
     # Mesh, Node, Object, Paint, Physics, Render, Rigging, Scene, Sequencer, System, Text Editor, UV, User Interface
     "category": "Object",
 }
-
 
 menus: list[tuple[str, Callable]] = [
     # ("NODE_MT_context_menu", menu_function),
@@ -47,8 +48,10 @@ menus: list[tuple[str, Callable]] = [
     # ("VIEW3D_MT_mesh_add", menu_function),
 
     # Context (Spacebar/W) Menu
-    ("VIEW3D_MT_object_context_menu", addon.menuitem(object_context_menu.UntitledBlenderAddonSubmenu)),
-    ("VIEW3D_MT_object_context_menu", addon.menuitem(an_operator.AnOperator, 'INVOKE_DEFAULT')),
+    ("VIEW3D_MT_object_context_menu",
+     addon.menuitem(object_context_menu.UNTITLED_BLENDER_ADDON_MT_UntitledBlenderAddonSubmenu)),
+    ("VIEW3D_MT_object_context_menu",
+     addon.menuitem(an_operator.UNTITLED_BLENDER_ADDON_OT_AnOperator, 'INVOKE_DEFAULT')),
 
     # Some common ones:
     # "Object" menu

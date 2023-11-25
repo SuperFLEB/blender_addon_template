@@ -23,7 +23,7 @@ def generate_enum_items(self, context) -> list[tuple[str, str, str]]:
     return result
 
 
-class AnOperator(Operator):
+class UNTITLED_BLENDER_ADDON_OT_AnOperator(Operator):
     """Description goes here"""
     bl_idname = "untitled_blender_addon.an_operator"
     bl_label = "An Operator"
@@ -110,4 +110,4 @@ class AnOperator(Operator):
         return {'FINISHED'}
 
 
-REGISTER_CLASSES = [AnOperator]
+REGISTER_CLASSES = [UNTITLED_BLENDER_ADDON_OT_AnOperator]
