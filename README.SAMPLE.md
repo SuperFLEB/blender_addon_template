@@ -1,5 +1,7 @@
 # Untitled Blender Addon
 
+![Untitled Blender Addon](docs_support/banner.png)
+
 https://github.com/{USERNAME}/{REPONAME}
 
 This is a Blender addon that allows you to do more in Blender than you could before.

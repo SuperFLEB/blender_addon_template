@@ -38,7 +38,7 @@ except subprocess.CalledProcessError:
 # SETUP
 root_dir = "src"  # Start here
 toss_ins = ["demo", "README", "README.md", "LICENSE",
-            "COPYING"]  # Toss these files in from the super-root directory, too.
+            "COPYING", "docs_support"]  # Toss these files in from the super-root directory, too.
 exclude_regexes = [r"__pycache__", r"^venv", r"\.git(ignore|modules)?", r"^\.idea",
                    r".blend1$"]  # Exclude anything that matches these
 wrap_dir = "untitled_blender_addon"  # Wrap the output in a directory in the ZIP file
