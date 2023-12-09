@@ -16,7 +16,6 @@ tricks and code snippets. It evolves as I muddle my way through. They might not 
   * A subclass for no-draw() simplified submenus
   * Support for a `can_show()` static method on operators. Like `poll()`, but hides the item instead of graying it out.
     * _Note that the `can_show()` method needs to be tested in menu and submenu `draw()` functions. It is not built in to Blender itself like `poll()` is. The check is included in the sample submenu and the `__init__.js` file._ 
-* Starter unit tests
 * A `util` lib with some handy functions:
   * Flatten lists!
   * Wrap words!
@@ -42,6 +41,7 @@ tricks and code snippets. It evolves as I muddle my way through. They might not 
 * Make a Python script to do the setup, instead of a bunch of search/replace
 * Some libs for/examples of loading external data
   * Simple, and clean-up-after-yourself loading
+* Test examples (There used to be some, but they were removed because they didn't work with Blender)
 
 ## How to use it
 
@@ -111,6 +111,4 @@ Of course, the script is easily customizable to add exceptions and toss-ins, and
 ## What it doesn't do
 
 * It doesn't look at `.gitignore`. You might want some of those files.
-* It doesn't run tests before packaging. Since it'd need to find and run the right version of Blender, 
-  that's a hassle too far.
 * It doesn't verify that the file is installable. You should do that.
