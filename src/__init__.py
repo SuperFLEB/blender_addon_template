@@ -5,6 +5,7 @@ from .operator import a_simple_operator
 from .operator import an_operator
 from .operator import an_operator_with_a_uilist
 from .menu import object_context as object_context_menu
+from .menu import node_editor_header
 from .panel import preferences as preferences_panel
 from .panel import n_panel
 from .panel import object_panel
@@ -14,7 +15,7 @@ if "_LOADED" in locals():
 
     for mod in (
     addon, a_simple_operator, an_operator, an_operator_with_a_uilist, object_context_menu, preferences_panel, n_panel,
-    object_panel,):  # list all imports here
+    object_panel, node_editor_header):  # list all imports here
         importlib.reload(mod)
 _LOADED = True
 
@@ -37,6 +38,7 @@ bl_info = {
     "category": "Object",
 }
 
+# This can be used to register menus (MT) or header items (HT)
 menus: list[tuple[str, Callable]] = [
     # ("NODE_MT_context_menu", menu_function),
     # Some common ones:
@@ -52,6 +54,9 @@ menus: list[tuple[str, Callable]] = [
      addon.menuitem(object_context_menu.UNTITLED_BLENDER_ADDON_MT_UntitledBlenderAddonSubmenu)),
     ("VIEW3D_MT_object_context_menu",
      addon.menuitem(an_operator.UNTITLED_BLENDER_ADDON_OT_AnOperator, 'INVOKE_DEFAULT')),
+
+    # Node editor header
+    ("NODE_HT_header", node_editor_header.node_editor_header),
 
     # Some common ones:
     # "Object" menu
@@ -484,6 +489,31 @@ menus: list[tuple[str, Callable]] = [
     # ("WM_MT_splash_about", menu_function),
     # ("WM_MT_splash_quick_setup", menu_function),
     # ("WM_MT_toolsystem_submenu", menu_function),
+
+    # Headers
+    # ("CLIP_HT_header", menu_function),
+    # ("CONSOLE_HT_header", menu_function),
+    # ("DOPESHEET_HT_header", menu_function),
+    # ("FILEBROWSER_HT_header", menu_function),
+    # ("GRAPH_HT_header", menu_function),
+    # ("IMAGE_HT_header", menu_function),
+    # ("IMAGE_HT_tool_header", menu_function),
+    # ("INFO_HT_header", menu_function),
+    # ("NLA_HT_header", menu_function),
+    # ("NODE_HT_header", menu_function),
+    # ("OUTLINER_HT_header", menu_function),
+    # ("PROPERTIES_HT_header", menu_function),
+    # ("SEQUENCER_HT_header", menu_function),
+    # ("SEQUENCER_HT_tool_header", menu_function),
+    # ("SPREADSHEET_HT_header", menu_function),
+    # ("STATUSBAR_HT_header", menu_function),
+    # ("TEXT_HT_footer", menu_function),
+    # ("TEXT_HT_header", menu_function),
+    # ("TOPBAR_HT_upper_bar", menu_function),
+    # ("USERPREF_HT_header", menu_function),
+    # ("VIEW3D_HT_header", menu_function),
+    # ("VIEW3D_HT_tool_header", menu_function),
+
 ]
 
 # Registerable modules have a REGISTER_CLASSES list that lists all registerable classes in the module
@@ -499,30 +529,16 @@ registerable_modules = [
 
 
 def register() -> None:
-    for c in addon.get_registerable_classes(registerable_modules):
-        # Attempt to clean up if the addon broke during registration.
-        try:
-            bpy.utils.unregister_class(c)
-        except RuntimeError:
-            pass
-        bpy.utils.register_class(c)
-        if hasattr(c, 'post_register') and callable(c.post_register):
-            c.post_register()
-        print("Untitled Blender Addon registered class:", c)
+    addon.warn_unregisterable(registerable_modules)
+    addon.register_classes(registerable_modules)
+    addon.register_functions(registerable_modules)
     addon.register_menus(menus)
 
 
 def unregister() -> None:
     addon.unregister_menus(menus)
-    for m in menus[::-1]:
-        getattr(bpy.types, m[0]).remove(m[1])
-    for c in addon.get_registerable_classes(registerable_modules)[::-1]:
-        try:
-            bpy.utils.unregister_class(c)
-            if hasattr(c, 'post_unregister') and callable(c.post_unregister):
-                c.post_unregister()
-        except RuntimeError:
-            pass
+    addon.unregister_functions(registerable_modules)
+    addon.unregister_classes(registerable_modules)
 
 
 if __name__ == "__main__":
