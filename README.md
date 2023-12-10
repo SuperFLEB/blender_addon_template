@@ -98,17 +98,18 @@ and a `name_of_project_0.1.2.zip` file will be generated, which can be installed
 ## What it does
 
 1. Uses `git` to determine the version (by tag)
-2. Creates a ZIP archive named `{Project name}_{Git tag name}.zip`
-3. Puts everything in a directory named in the script
-4. Adds all files in `src`, except...
+2. Blows up if you forgot to update the version in your bl_info boilerplate
+3. Creates a ZIP archive named `{Project name}_{Git tag name}.zip`
+4. Puts everything in a directory named in the script
+5. Adds all files in `src`, except...
   * Untracked files (from Git)
   * Files matching `/__pycache__/`, `/^venv/`, `/\.gitignore/`, `/^\.idea/`, and `/.blend1$/`
-5. Adds "toss-in" files from outside the `src` directory:
-    * `demo`, `README`, `README.md`, `LICENSE`, and `COPYING`, if they exist
+6. Adds "toss-in" files from outside the `src` directory:
+    * `demo`, `README`, `README.md`, `LICENSE`, the `docs_support` directory, and `COPYING`, if they exist
 
 Of course, the script is easily customizable to add exceptions and toss-ins, and to tweak file names.
 
 ## What it doesn't do
 
-* It doesn't look at `.gitignore`. You might want some of those files.
+* It doesn't ignore files in `.gitignore`. You might want some of those files.
 * It doesn't verify that the file is installable. You should do that.
