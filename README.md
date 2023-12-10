@@ -2,7 +2,7 @@
 
 https://github.com/SuperFLEB/blender-addon-template
 
-This is a starting template for making Blender 3.1+ addon projects, that includes a basic structure and a few
+This is a starting template for making Blender 3.4+ addon projects that includes a basic structure and a few
 tricks and code snippets. It evolves as I muddle my way through. They might not all be best practices, but they're mine. 
 
 ## What's Included
