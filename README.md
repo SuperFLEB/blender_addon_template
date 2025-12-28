@@ -61,7 +61,10 @@ tricks and code snippets. It evolves as I muddle my way through. They might not 
         {USERNAME}/{REPONAME}   -> The GitHub info for this repo
    ```
    You'll also probably want to rename some of the class and parameter names in the operators if you use them as a base.
-3. Swap in the `README.SAMPLE.md` file for `README.md` and customize it
+3. Swap in the following files:
+    - `README.md` (`README.SAMPLE.md`)
+    - `LICENSE` (`LICENSE.(type).SAMPLE`)
+    - `CONTRIBUTING.md` (`CONTRIBUTING.SAMPLE.md`)
 4. Start making your Blender addon!
 
 # build_release.py
