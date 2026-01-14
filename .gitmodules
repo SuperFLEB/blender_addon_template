@@ -1,0 +1,3 @@
+[submodule "src/lib/esq"]
+	path = src/lib/esq
+	url = git@github.com:SuperFLEB/esq.git

@@ -10,6 +10,8 @@ This library contains helper functions useful in setup and management of Blender
 It is required by the __init__.py, so don't remove it unless you fix dependencies.
 """
 
+ADDON_DEBUG_NAME = "Untitled Blender Addon"
+
 def _collate_registerable(registerable_modules: list[ModuleType], attribute: str) -> list[Type] | list[Callable]:
     # Classes grouped by module
     mod_items = [getattr(mod, attribute) for mod in registerable_modules if hasattr(mod, attribute)]
@@ -76,7 +78,7 @@ def menuitem(cls: bpy.types.Operator | bpy.types.Menu | Callable, operator_conte
     if callable(cls):
         return cls
 
-    raise Exception(f"Untitled Blender Addon: Unknown menu type for menu {cls}. The developer screwed up.")
+    raise Exception(f"{ADDON_DEBUG_NAME}: Unknown menu type for menu {cls}. The developer screwed up.")
 
 
 def warn_unregisterable(registerable_modules: list[ModuleType]) -> None:
@@ -111,11 +113,11 @@ def register_classes(registerable_modules: list[ModuleType], register: bool = Tr
             bpy.utils.register_class(cls)
             if hasattr(cls, 'post_register') and callable(cls.post_register):
                 cls.post_register()
-            print("Untitled Blender Addon registered class:", cls)
+            print(f"{ADDON_DEBUG_NAME} registered class:", cls)
         else:
             if hasattr(cls, 'post_unregister') and callable(cls.post_unregister):
                 cls.post_unregister()
-            print("Untitled Blender Addon unregistered class:", cls)
+            print(f"{ADDON_DEBUG_NAME} unregistered class:", cls)
 
 
 def unregister_classes(registerable_modules: list[ModuleType]) -> None:
@@ -151,7 +153,7 @@ def unregister_functions(registerable_modules: list[ModuleType]):
 def register_menus(menus: list[tuple[str, Callable]]):
     for m in menus:
         if not callable(m[1]):
-            print(f"(!) Untitled Blender Addon: {m[1]} must be a draw function (callable) to append to menu/panel {m[0]}")
+            print(f"(!) {ADDON_DEBUG_NAME}: {m[1]} must be a draw function (callable) to append to menu/panel {m[0]}")
             continue
         getattr(bpy.types, m[0]).append(m[1])
 

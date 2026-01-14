@@ -1,3 +1,7 @@
+# f8 import and f8.init() should be run ONCE in your __init__, before the first f8.reload()
+from .lib import f8
+f8.init()
+
 from typing import Callable
 import bpy
 from .lib import addon
@@ -10,14 +14,9 @@ from .panel import preferences as preferences_panel
 from .panel import n_panel
 from .panel import object_panel
 
-if "_LOADED" in locals():
-    import importlib
-
-    for mod in (
-    addon, a_simple_operator, an_operator, an_operator_with_a_uilist, object_context_menu, preferences_panel, n_panel,
-    object_panel, node_editor_header):  # list all imports here
-        importlib.reload(mod)
-_LOADED = True
+# List all imports here
+f8.reload(addon, a_simple_operator, an_operator, an_operator_with_a_uilist, object_context_menu, preferences_panel, n_panel,
+    object_panel, node_editor_header)
 
 package_name = __package__
 
@@ -539,7 +538,6 @@ def unregister() -> None:
     addon.unregister_menus(menus)
     addon.unregister_functions(registerable_modules)
     addon.unregister_classes(registerable_modules)
-
 
 if __name__ == "__main__":
     register()

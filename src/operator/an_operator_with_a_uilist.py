@@ -3,15 +3,11 @@ import bpy
 import random
 from bpy.props import StringProperty, IntProperty, FloatProperty, BoolProperty, EnumProperty, CollectionProperty
 from bpy.types import Operator, PropertyGroup, UIList
+from ..lib import f8
 from ..lib import pkginfo
 from ..lib import util
 
-if "_LOADED" in locals():
-    import importlib
-
-    for mod in (pkginfo, util,):  # list all imports here
-        importlib.reload(mod)
-_LOADED = True
+f8.reload(pkginfo, util) # Reload any imports here
 
 package_name = pkginfo.package_name()
 
