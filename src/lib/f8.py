@@ -6,7 +6,7 @@ import importlib
 import types
 import sys
 from . import addon as addon_lib
-from .esq import ESQ
+from .ESQ import ESQ
 
 importlib.reload(addon_lib)
 loaded_modules: set[types.ModuleType] = {addon_lib}
