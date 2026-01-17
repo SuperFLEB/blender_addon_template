@@ -1,0 +1,47 @@
+schema_version = "1.0.0"
+
+id = "untitled_blender_addon"
+version = "0.1.0"
+name = "Untitled Blender Addon"
+tagline = "Description goes here"
+maintainer = "Name goes here"
+type = "add-on"
+website = "https://github.com/{USERNAME}/{REPONAME}"
+
+# https://docs.blender.org/manual/en/dev/advanced/extensions/tags.html
+# tags = ["Animation", "Sequencer"]
+
+blender_version_min = "4.2.0"
+# blender_version_max = "5.1.0"
+
+# https://spdx.org/licenses/ (use "SPDX:" prefix)
+# https://docs.blender.org/manual/en/dev/advanced/extensions/licenses.html
+license = [
+#   "SPDX:GPL-3.0-or-later", # ...if you want to get it on the Blender Extensions site
+    "SEE LICENSE FILE"
+]
+
+# Optional: required by some licenses.
+copyright = [
+    "2026 Name goes here",
+]
+
+# platforms = ["windows-x64", "macos-arm64", "linux-x64", "windows-arm64", "macos-x64"]
+
+# wheels = [
+#   "./wheels/something.whl",
+# ]
+
+# [permissions]
+# clipboard = "To look like I belong on a job site"
+# files = "To read all your stuff"
+# network = "In this economy? Good luck getting a job without knowing somebody"
+# camera = "Creepin' on ya"
+# microphone = "Because the sound of your voice fills me with joy when I hear it... which is to say, creepin' on ya"
+
+# [build]
+# paths_exclude_pattern = [
+#   "__pycache__/",
+#   "/.git/",
+#   "/*.zip",
+# ]
