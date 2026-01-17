@@ -1,13 +1,8 @@
 import bpy
-
 from ..lib import pkginfo
+from ..lib import f8
 
-if "_LOADED" in locals():
-    import importlib
-
-    for mod in (pkginfo,):  # list all imports here
-        importlib.reload(mod)
-_LOADED = True
+f8.reload(pkginfo) # Reload any imports here
 
 package_name = pkginfo.package_name()
 

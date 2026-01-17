@@ -1,13 +1,8 @@
 import bpy
 from bpy.types import Panel
+from ..lib import f8
 
-if "_LOADED" in locals():
-    import importlib
-
-    for mod in ():  # list all imports here
-        importlib.reload(mod)
-_LOADED = True
-
+f8.reload() # Reload any imports here
 
 class OBJECT_PT_ObjectPanel(bpy.types.Panel):
     """An example object properties panel"""

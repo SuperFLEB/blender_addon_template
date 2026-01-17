@@ -1,14 +1,18 @@
-import bpy
-from bpy.types import Operator, Menu
-from typing import Callable, Type
-from types import ModuleType
-
-from hashlib import md5
-
 """
 This library contains helper functions useful in setup and management of Blender addons.
 It is required by the __init__.py, so don't remove it unless you fix dependencies.
 """
+
+import bpy
+from bpy.types import Operator, Menu
+from typing import Callable, Type
+from types import ModuleType
+from .log import ConsoleLogger
+from .ESQ import ESQ
+
+ADDON_DEBUG_NAME = "Untitled Blender Addon"
+_logger = None
+
 
 def _collate_registerable(registerable_modules: list[ModuleType], attribute: str) -> list[Type] | list[Callable]:
     # Classes grouped by module
@@ -16,11 +20,13 @@ def _collate_registerable(registerable_modules: list[ModuleType], attribute: str
     # Flatten (comprehension) and deduplicate (list(dict.fromkeys()))
     return list(dict.fromkeys([c for mc in mod_items for c in mc]))
 
+
 class SimpleMenu(Menu):
     # If the menu item needs its own operator context, use a tuple of (OperatorClass, "context")
     items: list[Operator | Menu | str | None | tuple[Operator, str]] = []
 
     operator_context: str = "INVOKE_REGION_WIN"
+
     def draw(self, context) -> None:
         self.layout.operator_context = self.operator_context
 
@@ -41,7 +47,7 @@ class SimpleMenu(Menu):
                     layout.operator_context = item[1]
                     item = item[0]
                 else:
-                    print("(!) Bad tuple in SimpleMenu: ", item)
+                    logger().error("Bad tuple in SimpleMenu: ", item)
 
             if (not hasattr(item, 'can_show')) or item.can_show(context):
                 if issubclass(item, bpy.types.Menu):
@@ -51,9 +57,14 @@ class SimpleMenu(Menu):
                     layout.operator(item.bl_idname)
                     continue
 
-            print("(!) Unknown menu item type in SimpleMenu: ", item)
+            logger().warning("Unknown menu item type in SimpleMenu: ", item)
 
 
+def logger():
+    global _logger
+    if _logger is None:
+        _logger = ConsoleLogger(ADDON_DEBUG_NAME)
+    return _logger
 
 
 def menuitem(cls: bpy.types.Operator | bpy.types.Menu | Callable, operator_context: str = "EXEC_DEFAULT") -> Callable:
@@ -70,22 +81,25 @@ def menuitem(cls: bpy.types.Operator | bpy.types.Menu | Callable, operator_conte
     if issubclass(cls, bpy.types.Menu):
         def submenu_fn(self, context):
             self.layout.menu(cls.bl_idname)
+
         return submenu_fn
 
     # Custom draw function
     if callable(cls):
         return cls
 
-    raise Exception(f"Untitled Blender Addon: Unknown menu type for menu {cls}. The developer screwed up.")
+    raise Exception(f"{ADDON_DEBUG_NAME}: Unknown menu type for menu {cls}. The developer screwed up.")
 
 
 def warn_unregisterable(registerable_modules: list[ModuleType]) -> None:
     def can_register(mod: ModuleType) -> bool:
-        return hasattr(mod, "REGISTER_CLASSES") or hasattr(mod, "REGISTER_FUNCTIONS") or hasattr(mod, "UNREGISTER_FUNCTIONS")
+        return hasattr(mod, "REGISTER_CLASSES") or hasattr(mod, "REGISTER_FUNCTIONS") or hasattr(mod,
+                                                                                                 "UNREGISTER_FUNCTIONS")
+
     unregisterable = [mod for mod in registerable_modules if not can_register(mod)]
     if unregisterable:
-        print("Untitled Blender Addon: Some modules had nothing to register:")
-        print("\n".join([f" - {mod}" for mod in unregisterable]))
+        logger().warning("Untitled Blender Addon: Some modules had nothing to register:")
+        logger().warning("\n".join([f" - {mod}" for mod in unregisterable]))
 
 
 def register_classes(registerable_modules: list[ModuleType], register: bool = True) -> None:
@@ -105,17 +119,17 @@ def register_classes(registerable_modules: list[ModuleType], register: bool = Tr
             bpy.utils.unregister_class(cls)
         except RuntimeError:
             if not register:
-                print("(!) Untitled Blender Addon failed to unregister class:", cls)
+                logger().error("Untitled Blender Addon failed to unregister class:", cls)
 
         if register:
             bpy.utils.register_class(cls)
             if hasattr(cls, 'post_register') and callable(cls.post_register):
                 cls.post_register()
-            print("Untitled Blender Addon registered class:", cls)
+            logger().debug(ESQ.green("reg➕ ") + cls)
         else:
             if hasattr(cls, 'post_unregister') and callable(cls.post_unregister):
                 cls.post_unregister()
-            print("Untitled Blender Addon unregistered class:", cls)
+            logger().debug(ESQ.yellow("reg➖ ") + cls)
 
 
 def unregister_classes(registerable_modules: list[ModuleType]) -> None:
@@ -148,10 +162,11 @@ def unregister_functions(registerable_modules: list[ModuleType]):
     for function in _collate_registerable(registerable_modules, "UNREGISTER_FUNCTIONS")[::-1]:
         function()
 
+
 def register_menus(menus: list[tuple[str, Callable]]):
     for m in menus:
         if not callable(m[1]):
-            print(f"(!) Untitled Blender Addon: {m[1]} must be a draw function (callable) to append to menu/panel {m[0]}")
+            logger().error(f"{m[1]} must be a draw function (callable) to append to menu/panel {m[0]}")
             continue
         getattr(bpy.types, m[0]).append(m[1])
 

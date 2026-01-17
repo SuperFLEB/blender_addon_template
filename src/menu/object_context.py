@@ -3,13 +3,9 @@ from ..operator import a_simple_operator
 from ..operator import an_operator
 from ..operator import an_operator_with_a_uilist
 from ..lib import addon
+from ..lib import f8
 
-if "_LOADED" in locals():
-    import importlib
-
-    for mod in (a_simple_operator, an_operator, an_operator_with_a_uilist,):  # list all imports here
-        importlib.reload(mod)
-_LOADED = True
+f8.reload(a_simple_operator, an_operator, an_operator_with_a_uilist) # Reload any imports here
 
 
 class UNTITLED_BLENDER_ADDON_MT_UntitledBlenderAddonSubmenu(addon.SimpleMenu):
