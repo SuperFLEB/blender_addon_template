@@ -11,7 +11,7 @@ website = "https://github.com/{USERNAME}/{REPONAME}"
 # https://docs.blender.org/manual/en/dev/advanced/extensions/tags.html
 # tags = ["Animation", "Sequencer"]
 
-blender_version_min = "4.2.0"
+blender_version_min = "4.5.0"
 # blender_version_max = "5.1.0"
 
 # https://spdx.org/licenses/ (use "SPDX:" prefix)
