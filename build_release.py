@@ -7,11 +7,15 @@ This script adds a few niceties on top of the Blender extension builder:
 - Generates a "fake" version tag if there is no Git tag set
 - Includes any files/directories/globs specified in the blender_manifest.toml "parent_files" array
 
-It requires the BLENDER environment variable to be set to the path of the Blender executable used for building,
+It requires the BLENDER_PATH environment variable to be set to the path of the Blender executable used for building,
 and requires the "tomlkit" package to be installed (included in the requirements.txt file). This can be set in a
 .env file in the root of the repository, or by setting the environment variable before running the script..
 
 To use:
+
+BLENDER_PATH=/path/to/blender python3 build_release.py
+
+(or if you set up the .env file already)
 
 python3 build_release.py
 """
@@ -23,7 +27,10 @@ import zipfile
 import subprocess
 from tempfile import mkdtemp
 from os import environ
+from dotenv import load_dotenv
 import re
+
+load_dotenv()
 
 def get_version() -> str | None:
     try:
@@ -46,9 +53,9 @@ def get_fake_version(current_version: str | None = None) -> str:
     parts = current_version.split(".")
     return ".".join(parts[0:2] + [str(int(parts[2]) + 1)]) + "-dev-" + hash
 
-if environ.get("BLENDER") is None or shutil.which(environ["BLENDER"]) is None:
+if environ.get("BLENDER_PATH") is None or shutil.which(environ["BLENDER_PATH"]) is None:
     raise RuntimeError(
-        "BLENDER environment variable must be set to the path of the Blender executable."
+        "BLENDER_PATH environment variable must be set to the path of the Blender executable."
     )
 
 with open("src/blender_manifest.toml", "r") as in_file:
@@ -82,7 +89,7 @@ try:
     temp_path = pathlib.Path(temp_dir)
     print(f"Temporary generation to: {temp_dir}")
 
-    subprocess.run([environ["BLENDER"], "--factory-startup", "--command", "extension", "build", "--verbose", "--source-dir", "src",
+    subprocess.run([environ["BLENDER_PATH"], "--factory-startup", "--command", "extension", "build", "--verbose", "--source-dir", "src",
          "--output-dir", temp_dir])
 
     zips = temp_path.glob("*.zip")
