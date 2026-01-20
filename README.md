@@ -7,7 +7,7 @@ tricks and code snippets. It evolves as I muddle my way through. They might not 
 
 ## What's Included
 
-* A structure featuring a `src` directory for packageable source.
+* Blender 4.5+ extension structure with a `blender_manifest.toml` file and wheels and all that.
 * Directories for library files (simple modules with collections of functions)
 * An `__init__.py` and `lib/addon.py` with register/deregister functions...
   * Class registration via list
@@ -31,10 +31,13 @@ tricks and code snippets. It evolves as I muddle my way through. They might not 
   * A Properties panel (N panel)
   * A submenu
 * A packager, build_release.py
+  * Uses the Blender extension builder to package up the addon, plus:
+    * ...allows adding extra files from the root directory, such as README and licenses
+    * ...automatically downloads wheels, bundles them into a directory, and adds them to the blender_manifest.toml
   * Packs up `src`, and throws in whatever else you want
-  * Uses Git tags and the bl_info to set the version number
+  * Uses Git v0.0.0-... semver tags to set the version number
 
-...and (if I forgot to update this Readme) more!
+...and (if I forgot to update this Readme) so much more!
 
 ## What's not included, that I really ought to (i.e., the to-do list)
 
@@ -72,23 +75,19 @@ tricks and code snippets. It evolves as I muddle my way through. They might not 
 `build_release.py` is a script that will package up your `src` directory, plus some other files, and make a ZIP archive,
 ready to install. It's easily customizable and comes out-of-the-box ready to handle most projects built off this template.
 
-## Necessary Customizations
-
-Customizations can be done in the `# SETUP` section of the file. The minimum items that will need to be customized are:
-
-* `wrap_dir` - The directory the addon will wrapped in, i.e., what directory it will be installed to.
-* `output_file` - The file name of the ZIP file to be generated.
-
-If you did all the global replaces in the list up above, though, these will already be changed.
-
 ## How to use it
 
-Before building an actual release, you should update the `version` in your bl_info in `__init__.py`, then Git tag the
-latest commit to that version number (using either "X.X.X" or "vX.X.X" format), as this is included in the file naming.
+* You'll need Python and Blender installed.
+* Install the necessary dependencies for the builder script: `pip install -r requirements.txt`
+* Copy the `.env.example` file to `.env` and enter the path to your Blender executable.
+* Before building a release, you should update the `version` in your `blender_manifest.toml`, then Git tag the
+  latest commit to that version number (using "vX.X.X" format).
+  ```shell
+  git tag v0.1.2
+  ```
+  Builds that do not have a version tag will be set to
+  a version of "<major>.<minor>.<patch+1>-dev-<hash>" temporarily for the build.
 
-```shell
-git tag 0.1.2
-```
 
 Then, simply run
 
@@ -96,23 +95,4 @@ Then, simply run
 python build_release.py
 ```
 
-and a `name_of_project_0.1.2.zip` file will be generated, which can be installed via the Blender Add-ons manager.
-
-## What it does
-
-1. Uses `git` to determine the version (by tag)
-2. Blows up if you forgot to update the version in your bl_info boilerplate
-3. Creates a ZIP archive named `{Project name}_{Git tag name}.zip`
-4. Puts everything in a directory named in the script
-5. Adds all files in `src`, except...
-  * Untracked files (from Git)
-  * Files matching `/__pycache__/`, `/^venv/`, `/\.gitignore/`, `/^\.idea/`, and `/.blend1$/`
-6. Adds "toss-in" files from outside the `src` directory:
-    * `demo`, `README`, `README.md`, `LICENSE`, the `docs_support` directory, and `COPYING`, if they exist
-
-Of course, the script is easily customizable to add exceptions and toss-ins, and to tweak file names.
-
-## What it doesn't do
-
-* It doesn't ignore files in `.gitignore`. You might want some of those files.
-* It doesn't verify that the file is installable. You should do that.
+and a Blender-installable ZIP file will be generated.

@@ -8,11 +8,12 @@ This script adds a few niceties on top of the Blender extension builder:
 - Includes any files/directories/globs specified in the blender_manifest.toml "parent_files" array
 
 It requires the BLENDER environment variable to be set to the path of the Blender executable used for building,
-and requires the "tomlkit" package to be installed (included in the requirements.txt file).
+and requires the "tomlkit" package to be installed (included in the requirements.txt file). This can be set in a
+.env file in the root of the repository, or by setting the environment variable before running the script..
 
 To use:
 
-BLENDER=/path/to/blender python build_release.py
+python3 build_release.py
 """
 
 import tomlkit
@@ -58,7 +59,6 @@ wheels_dir = manifest.get("build", {}).get("wheels_dir", "wheels")
 
 # Download requirements to "wheels" directory
 subprocess.run(["pip", "wheel", "-r", "requirements.txt", "-w", wheels_dir], cwd="src")
-wheels = pathlib.Path(wheels_dir).glob("*.whl")
 
 # Update the version
 manifest_version = manifest["version"]
@@ -70,7 +70,9 @@ if version is None:
     print(f"There is no version tag on this commit, so using a temporary build version of {fake_version}")
 
 manifest["version"] = version or fake_version
-manifest["wheels"] = [p.name for p in wheels]
+
+wheels = pathlib.Path("src").joinpath(wheels_dir).glob("*.whl")
+manifest["wheels"] = [p.relative_to('src').as_posix() for p in wheels]
 
 with open("src/blender_manifest.toml", "w") as out_file:
     tomlkit.dump(manifest, out_file)

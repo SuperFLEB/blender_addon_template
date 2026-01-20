@@ -38,7 +38,7 @@ copyright = [
 # network = "In this economy? Good luck getting a job without knowing somebody"
 # camera = "Creepin' on ya"
 # microphone = "Because the sound of your voice fills me with joy when I hear it... which is to say, creepin' on ya"
-wheels = []
+wheels = ["wheels/fleb_esq-0.0.1-py3-none-any.whl"]
 
 [build]
 paths_exclude_pattern = [

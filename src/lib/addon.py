@@ -8,7 +8,7 @@ from bpy.types import Operator, Menu
 from typing import Callable, Type
 from types import ModuleType
 from .log import ConsoleLogger
-from .ESQ import ESQ
+from fleb.esq import ESQ
 
 ADDON_DEBUG_NAME = "Untitled Blender Addon"
 _logger = None

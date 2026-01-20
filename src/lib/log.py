@@ -1,7 +1,7 @@
 import sys
 import typing
 from enum import IntEnum
-from .ESQ import ESQ, ESQStyle, ESQBlock, join
+from fleb.esq import ESQ, ESQStyle, ESQBlock, join
 
 
 class LogLevel(IntEnum):
