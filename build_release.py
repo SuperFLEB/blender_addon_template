@@ -1,110 +1,105 @@
-#!/usr/bin/env python3
+# !/usr/bin/env python3
+"""
+This script adds a few niceties on top of the Blender extension builder:
 
+- Download the wheels from the src/requirements.txt file and update the blender_manifest.toml
+- Update the version in blender_manifest.toml if the Git tag is set to vMAJOR.MINOR.PATCH
+- Generates a "fake" version tag if there is no Git tag set
+- Includes any files/directories/globs specified in the blender_manifest.toml "parent_files" array
+
+It requires the BLENDER environment variable to be set to the path of the Blender executable used for building,
+and requires the "tomlkit" package to be installed (included in the requirements.txt file).
+
+To use:
+
+BLENDER=/path/to/blender python build_release.py
+"""
+
+import tomlkit
+import shutil
+import pathlib
+import zipfile
 import subprocess
+from tempfile import mkdtemp
+from os import environ
 import re
-import sys
-import ast
-from zipfile import ZipFile, ZIP_DEFLATED
-from pathlib import Path
-from os import chdir
 
-
-def bl_info_version() -> tuple[int, int, int] | None:
+def get_version() -> str | None:
     try:
-        module_fh = open('src/__init__.py', 'r')
-        module_file = module_fh.read()
-        module_fh.close()
-        for node in ast.parse(module_file).body:
-            if isinstance(node, ast.Assign) and node.targets[0].id == 'bl_info':
-                bl_info = ast.literal_eval(node.value)
-                return bl_info['version']
-    except:
+        my_tag = subprocess.check_output(["git", "describe", "--tags", "--exact-match", "--match", "v*"], stderr=subprocess.DEVNULL).decode("utf-8").strip()
+        return my_tag[1:]
+    except subprocess.CalledProcessError:
         return None
 
-# FIND AND VERIFY TAG
+def get_fake_version(current_version: str | None = None) -> str:
+    if current_version is None or not re.search(r"^\d+\.\d+\.\d+$", current_version):
+        try:
+            raw_tag = subprocess.check_output(["git", "describe", "--tags", "--match", "v*"], stderr=subprocess.DEVNULL).decode("utf-8").strip()
+            tag_parts = re.match(r"^v(\d+\.\d+\.\d+)-(\d+)-([a-z0-9]+)$", raw_tag)
+            current_version = "0.0.0" if tag_parts is None else tag_parts.group(1)
+        except subprocess.CalledProcessError:
+            current_version = "0.0.0"
+            pass
+
+    hash = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.DEVNULL).decode("utf-8").strip()
+    parts = current_version.split(".")
+    return ".".join(parts[0:2] + [str(int(parts[2]) + 1)]) + "-dev-" + hash
+
+if environ.get("BLENDER") is None or shutil.which(environ["BLENDER"]) is None:
+    raise RuntimeError(
+        "BLENDER environment variable must be set to the path of the Blender executable."
+    )
+
+with open("src/blender_manifest.toml", "r") as in_file:
+    manifest = tomlkit.load(in_file)
+
+parent_files = manifest.get("build", {}).get("parent_files", [])
+wheels_dir = manifest.get("build", {}).get("wheels_dir", "wheels")
+
+# Download requirements to "wheels" directory
+subprocess.run(["pip", "wheel", "-r", "requirements.txt", "-w", wheels_dir], cwd="src")
+wheels = pathlib.Path(wheels_dir).glob("*.whl")
+
+# Update the version
+manifest_version = manifest["version"]
+version = get_version()
+fake_version = None
+
+if version is None:
+    fake_version = get_fake_version(manifest_version)
+    print(f"There is no version tag on this commit, so using a temporary build version of {fake_version}")
+
+manifest["version"] = version or fake_version
+manifest["wheels"] = [p.name for p in wheels]
+
+with open("src/blender_manifest.toml", "w") as out_file:
+    tomlkit.dump(manifest, out_file)
+
 try:
-    tag_name = subprocess.check_output(["git", "describe", "--tags"], stderr=subprocess.DEVNULL).decode(
-        sys.stdout.encoding).strip()
-    tag_name = re.sub(r'[^\w._-]+', "_", tag_name)
-    if matches := re.fullmatch(r'v?(\d+)\.(\d+)\.(\d+)', tag_name):
-        bl_vers = bl_info_version()
-        tag_vers = tuple([int(g) for g in matches.groups()])
-        if bl_vers is not None and bl_vers != tag_vers:
-            print(f"<<!>> Version {bl_vers} in the bl_info global in src/__init__.py does not match \"{tag_name}\" in the tag. Setting version to \"latest\".")
-            tag_name = "latest"
-except subprocess.CalledProcessError:
-    tag_name = "latest"
+    temp_dir = mkdtemp()
+    temp_path = pathlib.Path(temp_dir)
+    print(f"Temporary generation to: {temp_dir}")
 
-# SETUP
-root_dir = "src"  # Start here
-toss_ins = ["demo", "README", "README.md", "LICENSE",
-            "COPYING", "docs_support"]  # Toss these files in from the super-root directory, too.
-exclude_regexes = [r"__pycache__", r"^venv", r"\.git(ignore|modules)?", r"^\.idea",
-                   r".blend1$"]  # Exclude anything that matches these
-wrap_dir = "untitled_blender_addon"  # Wrap the output in a directory in the ZIP file
-output_file = f"untitled_blender_addon_{tag_name}.zip"  # What to call the ZIP file
+    subprocess.run([environ["BLENDER"], "--factory-startup", "--command", "extension", "build", "--verbose", "--source-dir", "src",
+         "--output-dir", temp_dir])
 
-# EXECUTION
-home = str(Path(__file__).parents[0])
-chdir(home)
+    zips = temp_path.glob("*.zip")
+    output = next(zips, None)
+    if output is None:
+        raise RuntimeError("The build process did not produce a file.")
+    elif next(zips, None) is not None:
+        raise RuntimeError("Expected a single zip file in the output directory. Found more than one.")
 
+    with zipfile.ZipFile(output, "a") as zip_ref:
+        for globulet in parent_files:
+            for file in pathlib.Path(".").glob(globulet):
+                print(f"+ Adding {file.relative_to('.')} to archive...")
+                zip_ref.write(file, arcname=file.relative_to("."), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
 
-def regex_allows(p: str) -> bool:
-    return not [rx for rx in exclude_regexes if re.search(rx, str(p))]
-
-
-# Get paths
-paths = [p for p in Path(root_dir).rglob("**/*")]
-
-# Filter directories
-paths = [p for p in paths if not p.is_dir()]
-
-# Filter regex exclusions
-paths = [p for p in paths if regex_allows(str(p))]
-
-# Find Git untracked files
-try:
-    git_lsfiles_output = subprocess.check_output(["git", "ls-files", "--others"]).decode(sys.stdout.encoding)
-except subprocess.CalledProcessError:
-    git_lsfiles_output = ""
-git_untracked = [Path(p) for p in git_lsfiles_output.split("\n") if p]
-
-# Filter untracked out of paths -- Two-step and save the untracked_paths for later display
-untracked_paths = [p for p in paths if p in git_untracked]
-paths = [p for p in paths if p not in untracked_paths]
-
-# Add toss-in files
-tossin_all = [Path(p) for p in toss_ins if Path(p).exists()]
-tossin_paths = [p for p in tossin_all if not p.is_dir()]
-
-# Traverse toss-in directories
-for dp in tossin_all:
-    if dp.is_dir():
-        tossin_paths += [p for p in Path(dp).rglob("**/*")]
-
-# Filter out excluded files and untracked files from toss-ins
-untracked_tossins = [p for p in tossin_paths if p in git_untracked]
-tossin_paths = [p for p in tossin_paths if p not in untracked_tossins and regex_allows(str(p))]
-
-print(
-    "\nExclusions ---\n" + "\n".join([f"Excluding untracked file: {p}" for p in (untracked_paths + untracked_tossins)]))
-print(f"\nInclusions ---\nIncluding {len(paths)} files from {root_dir}")
-print("\n".join([f"Tossing in {p}" for p in tossin_paths]))
-print(f"\nOutput ---\n{output_file} at {Path(output_file).absolute()}")
-
-if Path(output_file).exists():
-    raise Exception("File already exists")
-
-print("\nCreating archive...\n")
-with ZipFile(output_file, mode="w", compression=ZIP_DEFLATED, compresslevel=9) as archive:
-    # Write normal files
-    for p in paths:
-        zip_path = str(Path(wrap_dir, *p.parts[1:]))
-        print("rootdir: ", zip_path)
-        archive.write(p, arcname=zip_path)
-    for p in tossin_paths:
-        zip_path = str(Path(wrap_dir, p))
-        print("toss-in: ", zip_path)
-        archive.write(p, arcname=zip_path)
-
-print(f"Created {output_file} at {Path(output_file).absolute()}")
+    shutil.move(output, ".")
+finally:
+    if fake_version is not None:
+        with open("src/blender_manifest.toml", "w") as out_file:
+            manifest["version"] = manifest_version
+            tomlkit.dump(manifest, out_file)
+            print(f"Restored blender_manifest.toml version to {manifest_version}")

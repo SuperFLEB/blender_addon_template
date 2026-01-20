@@ -20,23 +20,6 @@ f8.reload(addon, a_simple_operator, an_operator, an_operator_with_a_uilist, obje
 
 package_name = __package__
 
-bl_info = {
-    "name": "Untitled Blender Addon",
-    "description": "Description goes here",
-    "author": "Name goes here",
-    "version": (0, 1, 0),
-    "blender": (3, 4, 0),
-    "location": "View3D > Object",
-    "warning": "",  # used for warning icon and text in addons panel
-    "doc_url": "https://github.com/{USERNAME}/{REPONAME}",
-    "tracker_url": "https://github.com/{USERNAME}/{REPONAME}/issues",
-    "support": "COMMUNITY",
-    # Categories:
-    # 3D View, Add Curve, Add Mesh, Animation, Compositing, Development, Game Engine, Import-Export, Lighting, Material,
-    # Mesh, Node, Object, Paint, Physics, Render, Rigging, Scene, Sequencer, System, Text Editor, UV, User Interface
-    "category": "Object",
-}
-
 # This can be used to register menus (MT) or header items (HT)
 menus: list[tuple[str, Callable]] = [
     # ("NODE_MT_context_menu", menu_function),

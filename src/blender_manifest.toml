@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "untitled_blender_addon"
-version = "0.1.0"
+version = "2.0.0"
 name = "Untitled Blender Addon"
 tagline = "Description goes here"
 maintainer = "Name goes here"
@@ -38,10 +38,19 @@ copyright = [
 # network = "In this economy? Good luck getting a job without knowing somebody"
 # camera = "Creepin' on ya"
 # microphone = "Because the sound of your voice fills me with joy when I hear it... which is to say, creepin' on ya"
+wheels = []
 
-# [build]
-# paths_exclude_pattern = [
-#   "__pycache__/",
-#   "/.git/",
-#   "/*.zip",
-# ]
+[build]
+paths_exclude_pattern = [
+   "__pycache__/",
+   "/.git/",
+   "/*.zip",
+]
+parent_files = [
+    "README",
+    "README.*",
+    "LICENSE",
+    "LICENSE.*",
+    "docs_support",
+]
+wheels_dir = "wheels"

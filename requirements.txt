@@ -1,0 +1,2 @@
+# This is the requirements for the build script, not for the Blender module itself
+tomlkit==0.14.0
